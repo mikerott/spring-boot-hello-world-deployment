@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: $NAME
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: $NAME
+    spec:
+      containers:
+      - name: $NAME
+        image: $IMAGE
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: $PORT
+        env:
+          - name: SECRET
+            valueFrom:
+              secretKeyRef:
+                name: name-secret
+                key: KEY_SECRET
+          - name: NOT_SECRET
+            value: "I'm not a secret"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $NAME
+  labels:
+    app: $NAME
+spec:
+  type: NodePort
+  ports:
+    - port: $PORT
+  selector:
+    app: $NAME
